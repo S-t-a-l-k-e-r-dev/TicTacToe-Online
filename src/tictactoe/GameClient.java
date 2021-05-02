@@ -1,4 +1,4 @@
-package com.game;
+package tictactoe;
 
 import java.awt.*;
 import java.awt.event.MouseAdapter;
@@ -11,7 +11,7 @@ import java.util.Collections;
 
 import javax.swing.*;
 
-public class TicTacToeGUI extends JFrame implements TCPNet {
+public class TicTacToeGUI extends JFrame {
 
     private final String[][] board = {{"1", "2", "3"}, {"4", "5", "6"}, {"7", "8", "9"}};
     private final String[][] WaysToWin = {{"1", "2", "3"}, {"4", "5", "6"}, {"7", "8", "9"}, {"1", "4", "7"}, {"2", "5", "8"}, {"3", "6", "9"}, {"1", "5", "9"}, {"3", "5", "7"}};
@@ -136,8 +136,8 @@ public class TicTacToeGUI extends JFrame implements TCPNet {
         setSize(400, 450);
     }
 
-    @Override
-    public void onReceive(TCPConnection tcpConnection, String value) {
+
+    public void onReceive(String value) {
         try {
             if ("O".equals(String.valueOf(value.charAt(1)))) {
                 symToTurn = "O";
@@ -166,6 +166,9 @@ public class TicTacToeGUI extends JFrame implements TCPNet {
     }
     public static void main(String[] args) {
         SwingUtilities.invokeLater(TicTacToeGUI::new);
-//        SwingUtilities.invokeLater(TicTacToeGUI::new);
+        SwingUtilities.invokeLater(TicTacToeGUI::new);
+        SwingUtilities.invokeLater(TicTacToeGUI::new);
+        SwingUtilities.invokeLater(TicTacToeGUI::new);
+
     }
 }

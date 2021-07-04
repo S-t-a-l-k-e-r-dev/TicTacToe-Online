@@ -4,32 +4,27 @@ import java.io.*;
 import java.net.Socket;
 import java.nio.charset.StandardCharsets;
 
-public class TCPConnection {
+public class Connection {
 
     private final Socket socket;
     private Thread rxThread;
     private final BufferedReader in;
     private final BufferedWriter out;
 
-    public TCPConnection(GameServer eventListener, Socket socket) throws IOException {
+    public Connection(GameServer server,Socket socket) throws IOException {
         this.socket = socket;
-        this.in = new BufferedReader(new InputStreamReader(socket.getInputStream(),
-                StandardCharsets.UTF_8));
-        this.out = new BufferedWriter(new OutputStreamWriter(socket.getOutputStream(),
-                StandardCharsets.UTF_8));
-        connectServer(eventListener);
+        this.in = new BufferedReader(new InputStreamReader(socket.getInputStream(), StandardCharsets.UTF_8));
+        this.out = new BufferedWriter(new OutputStreamWriter(socket.getOutputStream(), StandardCharsets.UTF_8));
+        connectServer(server);
     }
-
-    public TCPConnection(TicTacToeGUI user, String ip, int port) throws IOException {
+    public Connection(GameClient user, String ip, int port) throws IOException {
         this.socket = new Socket(ip, port);
-        this.in = new BufferedReader(new InputStreamReader(socket.getInputStream(),
-                StandardCharsets.UTF_8));
-        this.out = new BufferedWriter(new OutputStreamWriter(socket.getOutputStream(),
-                StandardCharsets.UTF_8));
+        this.in = new BufferedReader(new InputStreamReader(socket.getInputStream(), StandardCharsets.UTF_8));
+        this.out = new BufferedWriter(new OutputStreamWriter(socket.getOutputStream(), StandardCharsets.UTF_8));
         connectUser(user);
     }
 
-    private void connectUser(TicTacToeGUI user) {
+    private void connectUser(GameClient user) {
         rxThread = new Thread(() -> {
             try {
                 while (!rxThread.isInterrupted()) {
@@ -44,13 +39,13 @@ public class TCPConnection {
     private void connectServer(GameServer eventListener) {
         rxThread = new Thread(() -> {
             try {
-                eventListener.onConnection(TCPConnection.this);
+                eventListener.onConnection(Connection.this);
                 while (!rxThread.isInterrupted()) {
-                    eventListener.onReceive(TCPConnection.this, in.readLine());
+                    eventListener.onReceive(Connection.this, in.readLine());
                 }
             } catch (IOException ignored) {
             } finally {
-                eventListener.onDisconnect(TCPConnection.this);
+                eventListener.onDisconnect(Connection.this);
             }
         });
         rxThread.start();

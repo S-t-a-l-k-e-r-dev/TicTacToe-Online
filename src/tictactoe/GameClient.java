@@ -11,19 +11,19 @@ import java.util.Collections;
 
 import javax.swing.*;
 
-public class TicTacToeGUI extends JFrame {
+public class GameClient extends JFrame {
 
     private final String[][] board = {{"1", "2", "3"}, {"4", "5", "6"}, {"7", "8", "9"}};
     private final String[][] WaysToWin = {{"1", "2", "3"}, {"4", "5", "6"}, {"7", "8", "9"}, {"1", "4", "7"}, {"2", "5", "8"}, {"3", "6", "9"}, {"1", "5", "9"}, {"3", "5", "7"}};
     private final JLabel[][] cells = new JLabel[3][3];
     private static final int PORT = 8189;
-    private TCPConnection connection;
+    private Connection connection;
     private String symToTurn;
     private int tie = 9;
     private boolean turn = false;
     private final ArrayList<String> prValue = new ArrayList<>(Collections.singletonList(" "));
 
-    private TicTacToeGUI() {
+    private GameClient() {
         super("Tic-tac-toe");
         setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
         setResizable(false);
@@ -32,12 +32,11 @@ public class TicTacToeGUI extends JFrame {
         setVisible(true);
         createGameUITable();
         try {
-            String IP_ADDR = InetAddress.getLocalHost().getHostAddress();
-            connection = new TCPConnection(this, IP_ADDR, PORT);
+            String IP = InetAddress.getLocalHost().getHostAddress();
+            connection = new Connection(this, IP, PORT);
         } catch (IOException e) {
-            JOptionPane.showMessageDialog(TicTacToeGUI.this, "Connection Failed");
+            JOptionPane.showMessageDialog(GameClient.this, "Connection Failed");
         }
-
     }
 
     public void createGameUITable() {
@@ -59,12 +58,12 @@ public class TicTacToeGUI extends JFrame {
                     @Override
                     public void mouseClicked(MouseEvent e) {
                         if (symToTurn == null) {
-                            JOptionPane.showMessageDialog(TicTacToeGUI.this, "Connection to server");
+                            JOptionPane.showMessageDialog(GameClient.this, "Connection to server");
                         } else {
                             if (turn) {
                                 makeTurn(number, symToTurn);
                             } else {
-                                JOptionPane.showMessageDialog(TicTacToeGUI.this, "Waiting player 2");
+                                JOptionPane.showMessageDialog(GameClient.this, "Waiting player 2");
                             }
                         }
                     }
@@ -87,7 +86,7 @@ public class TicTacToeGUI extends JFrame {
             connection.sendString(turnInput);
             checkWinner(turnInput, symToTurn);
         } else {
-            JOptionPane.showMessageDialog(TicTacToeGUI.this, "Slot already taken; re-enter slot number");
+            JOptionPane.showMessageDialog(GameClient.this, "Slot already taken; re-enter slot number");
         }
 
     }
@@ -104,16 +103,16 @@ public class TicTacToeGUI extends JFrame {
         String[] arr1 = {"X", "X", "X"}, arr2 = {"O", "O", "O"};
         for (String[] s : WaysToWin) {
             if (Arrays.equals(s, arr1)) {
-                JOptionPane.showMessageDialog(TicTacToeGUI.this, "X Won");
+                JOptionPane.showMessageDialog(GameClient.this, "X Won");
                 System.exit(0);
             }
             if (Arrays.equals(s, arr2)) {
-                JOptionPane.showMessageDialog(TicTacToeGUI.this, "O Won");
+                JOptionPane.showMessageDialog(GameClient.this, "O Won");
                 System.exit(0);
             }
         }
         if (tie == 0) {
-            JOptionPane.showMessageDialog(TicTacToeGUI.this, "It's Tie");
+            JOptionPane.showMessageDialog(GameClient.this, "It's Tie");
             System.exit(0);
         }
     }
@@ -164,11 +163,9 @@ public class TicTacToeGUI extends JFrame {
         }
 
     }
-    public static void main(String[] args) {
-        SwingUtilities.invokeLater(TicTacToeGUI::new);
-        SwingUtilities.invokeLater(TicTacToeGUI::new);
-        SwingUtilities.invokeLater(TicTacToeGUI::new);
-        SwingUtilities.invokeLater(TicTacToeGUI::new);
 
+    public static void main(String[] args) {
+        SwingUtilities.invokeLater(GameClient::new);
+        SwingUtilities.invokeLater(GameClient::new);
     }
 }

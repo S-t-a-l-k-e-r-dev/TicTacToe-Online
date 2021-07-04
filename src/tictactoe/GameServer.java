@@ -1,13 +1,13 @@
-package com.game;
+package tictactoe;
 
 import java.io.IOException;
 import java.net.ServerSocket;
 import java.util.ArrayList;
 import java.util.LinkedList;
 
-public class GameServer implements TCPNet {
-    private final LinkedList<TCPConnection> room = new LinkedList<>();
-    private final ArrayList<TCPConnection[]> connections = new ArrayList<>();
+public class GameServer {
+    private final LinkedList<Connection> room = new LinkedList<>();
+    private final ArrayList<Connection[]> connections = new ArrayList<>();
 
     public static void main(String[] args) {
         new GameServer();
@@ -20,7 +20,7 @@ public class GameServer implements TCPNet {
         try (ServerSocket serverSocket = new ServerSocket(8189)) {
             while (true) {
                 try {
-                    new TCPConnection(this, serverSocket.accept());
+                    new Connection(this, serverSocket.accept());
                 } catch (IOException e) {
                     System.out.println("TCPConnection exception: " + e);
                 }
@@ -30,10 +30,10 @@ public class GameServer implements TCPNet {
         }
     }
 
-    private void sendToAllConnections(String value, TCPConnection tcp) {
+    private void sendToAllConnections(String value, Connection tcp) {
         final int cnt = connections.size();
         if (cnt >= 1) {
-            for (TCPConnection[] connection : connections) {
+            for (Connection[] connection : connections) {
                 String str = null;
                 if (connection[0] == tcp) {
                     str = "O" + value;
@@ -49,7 +49,7 @@ public class GameServer implements TCPNet {
 
     public synchronized void putToServer() {
         if (room.size() >= 2) {
-            TCPConnection[] con = new TCPConnection[2];
+            Connection[] con = new Connection[2];
             con[0] = room.get(0);
             con[1] = room.get(1);
             room.pollFirst();
@@ -58,12 +58,11 @@ public class GameServer implements TCPNet {
         }
     }
 
-    @Override
-    public synchronized void onConnection(TCPConnection tcpConnection) {
+    public synchronized void onConnection(Connection tcpConnection) {
         UserCount++;
         room.add(tcpConnection);
         putToServer();
-        System.out.println(connections.size());
+        System.out.println("Number of connections to server: " + UserCount);
         sendSymbol();
     }
 
@@ -80,14 +79,11 @@ public class GameServer implements TCPNet {
         }
     }
 
-
-    @Override
-    public synchronized void onReceive(TCPConnection tcpConnection, String value) {
+    public synchronized void onReceive(Connection tcpConnection, String value) {
         sendToAllConnections(value, tcpConnection);
     }
 
-    @Override
-    public synchronized void onDisconnect(TCPConnection tcpConnection) {
+    public synchronized void onDisconnect(Connection tcpConnection) {
         int delete;
         for (int i = 0; i < connections.size(); i++) {
             if (connections.get(i)[0] == tcpConnection || connections.get(i)[1] == tcpConnection) {
@@ -97,7 +93,6 @@ public class GameServer implements TCPNet {
             }
         }
         room.remove(tcpConnection);
+        System.out.println("Number of connections to server: " + UserCount);
     }
-
-
 }
